@@ -1,0 +1,25 @@
+{
+  "name": "community_front",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/100-hours-a-week/KTB3_Sam_Full_Community_FRONT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "readline-sync": "^1.4.10"
+  },
+  "bugs": {
+    "url": "https://github.com/100-hours-a-week/KTB3_Sam_Full_Community_FRONT/issues"
+  },
+  "homepage": "https://github.com/100-hours-a-week/KTB3_Sam_Full_Community_FRONT#readme"
+}

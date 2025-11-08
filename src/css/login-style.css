@@ -1,0 +1,108 @@
+/* 전체 배경 및 정렬 */
+body {
+  background-color: #F4F5F7;
+  font-family: 'Noto Sans KR', sans-serif;
+  margin: 0;
+}
+
+.site-header {
+  width: 100%;
+  background-color: #F4F5F7;
+  border-bottom: 1px solid #000;
+  color: #000;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 40px;
+  box-sizing: border-box;
+}
+
+/* 로그인 컨텐츠만 중앙 정렬 */
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 60px); /* 헤더 높이만큼 제외 */
+}
+
+/* 제목 */
+.login-wrapper h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 40px;
+  color: #222;
+}
+
+/* form 구조 */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 입력 영역 카드 */
+.input-box {
+  background-color: #fff;
+  padding: 25px 30px;
+  width: 320px;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+/* label + input */
+.input-box label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.input-box input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 14px;
+  margin-bottom: 18px;
+  transition: border 0.2s;
+}
+
+.input-box input:focus {
+  outline: none;
+  border: 1px solid #7f6aee;
+}
+
+/* 로그인 버튼 */
+.login-button {
+  background-color: #aca0eb;
+  border: none;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  width: 320px;
+  padding: 12px 0;
+  border-radius: 0 0 12px 12px;
+  margin-top: 1px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.login-button:hover {
+  background-color: #7f6aee;
+  transform: translateY(-1px);
+}
+
+/* 회원가입 링크 */
+.signup-link {
+  margin-top: 18px;
+  color: #7f6aee;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
