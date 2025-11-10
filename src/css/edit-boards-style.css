@@ -130,7 +130,7 @@ header {
 }
 
 /* 버튼 */
-#add-btn {
+#edit-btn {
   background-color: #aca0eb;
   border: none;
   color: white;
@@ -141,7 +141,7 @@ header {
   transition: background-color 0.3s, transform 0.1s;
 }
 
-#add-btn:hover {
+#edit-btn:hover {
   background-color: #7f6aee;
   transform: translateY(-1px);
 }
