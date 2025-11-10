@@ -1,0 +1,152 @@
+body {
+  background-color: #F4F5F7;
+  font-family: 'Noto Sans KR', sans-serif;
+  margin: 0;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
+.back-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(calc(-100% - clamp(40px, 30vw, 210px)));
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.profile-menu {
+  position: absolute;
+  left: 50%;                           /* 중앙 기준 */
+  transform: translateX(calc(100% + clamp(40px, 30vw, 210px)));
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  filter: brightness(0.9) grayscale(0.2);
+  cursor: pointer;
+}
+
+/* 가로 드롭다운 */
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 50px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 10px 12px;
+  min-width: 140px;
+}
+
+.dropdown a {
+  display: block;
+  padding: 10px;
+  color: black;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dropdown a:hover {
+  background-color: #eee;
+}
+
+.profile-menu.active .dropdown {
+  display: block;
+}
+
+/* 본문 */
+.post-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.post-wrapper h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 30px;
+}
+
+.post-form {
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.post-form label {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.post-form input[type="text"],
+.post-form textarea {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  margin-bottom: 8px;
+  resize: none;
+  transition: border-color 0.2s;
+}
+
+.post-form input:focus,
+.post-form textarea:focus {
+  border-color: #7f6aee;
+  outline: none;
+}
+
+.helper-text {
+  color: red;
+  font-size: 12px;
+  margin-top: -2px;
+  margin-bottom: 12px;
+  min-height: 14px;
+}
+
+/* 버튼 */
+#submit-btn {
+  background-color: #aca0eb;
+  border: none;
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 0;
+  border-radius: 12px;
+  cursor: not-allowed;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+#submit-btn.active {
+  background-color: #7f6aee;
+  cursor: pointer;
+}
+
+#submit-btn.active:hover {
+  transform: translateY(-1px);
+}
