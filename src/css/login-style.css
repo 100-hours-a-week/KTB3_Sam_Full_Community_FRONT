@@ -5,16 +5,14 @@ body {
   margin: 0;
 }
 
-.site-header {
-  width: 100%;
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
   background-color: #F4F5F7;
-  border-bottom: 1px solid #000;
-  color: #000;
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-  padding: 12px 40px;
-  box-sizing: border-box;
+  border-bottom: 1px solid black;
 }
 
 /* 로그인 컨텐츠만 중앙 정렬 */
@@ -41,13 +39,19 @@ body {
   align-items: center;
 }
 
+.helper-text {
+  font-size: 12px;         /* 작게 */
+  color: #e74c3c;           /* 빨간색 (밝은 톤) */
+  margin-top: 5px;
+  margin-bottom: 30px;
+  line-height: 1.4;
+}
+
 /* 입력 영역 카드 */
 .input-box {
-  background-color: #fff;
+  background-color: #F4F5F7;
   padding: 25px 30px;
   width: 320px;
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
 /* label + input */
@@ -65,7 +69,7 @@ body {
   border-radius: 6px;
   padding: 0 10px;
   font-size: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 2px;
   transition: border 0.2s;
 }
 
@@ -83,16 +87,15 @@ body {
   font-size: 15px;
   width: 320px;
   padding: 12px 0;
-  border-radius: 0 0 12px 12px;
+  border-radius: 12px;
   margin-top: 1px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.08);
   cursor: pointer;
   transition: background-color 0.3s, transform 0.1s;
 }
 
-.login-button:hover {
+.login-button:enabled {
   background-color: #7f6aee;
-  transform: translateY(-1px);
 }
 
 /* 회원가입 링크 */

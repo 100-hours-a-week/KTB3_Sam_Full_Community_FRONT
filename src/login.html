@@ -5,25 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>로그인 | 아무 말 대잔치</title>
   <link rel="stylesheet" href="css/login-style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
-    아무 말 대잔치
+  <header>
+    <h1>아무 말 대잔치</h1>
   </header>
   <div class="login-wrapper">
     <h1>로그인</h1>
-    <form class="login-form">
+    <form class="login-form" id="loginForm">
       <div class="input-box">
         <label for="email">이메일</label>
         <input type="email" id="email" placeholder="이메일을 입력하세요" required>
+        <p id="emailHelper" class="helper-text"></p>
 
         <label for="password">비밀번호</label>
         <input type="password" id="password" placeholder="비밀번호를 입력하세요" required>
+        <p id="passwordHelper" class="helper-text"></p>
       </div>
 
-      <button type="submit" class="login-button">로그인</button>
+      <button type="submit" id="loginBtn" class="login-button">로그인</button>
     </form>
-    <a href="#" class="signup-link">회원가입</a>
+    <a href="singup.html" class="signup-link">회원가입</a>
   </div>
+  <script src="js/login-script.js"></script>
 </body>
 </html>
