@@ -40,8 +40,8 @@ header {
 }
 
 .helper-text {
-  font-size: 12px;         /* 작게 */
-  color: #e74c3c;           /* 빨간색 (밝은 톤) */
+  font-size: 12px;
+  color: #e74c3c;
   margin-top: 5px;
   margin-bottom: 30px;
   line-height: 1.4;

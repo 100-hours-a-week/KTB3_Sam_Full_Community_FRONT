@@ -45,6 +45,16 @@ function checkPasswordInput() {
   }
 }
 
+checkEmailInput();
+checkPasswordInput();
+updateButtonState();
+
+window.addEventListener('pageshow', () => {
+  checkEmailInput();
+  checkPasswordInput();
+  updateButtonState();
+})
+
 
 email.addEventListener('input', () => {
   checkEmailInput();
@@ -56,50 +66,52 @@ password.addEventListener('input', () => {
   updateButtonState();
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  checkEmailInput();
-  checkPasswordInput();
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  if (validateEmail(email.value) && validatePassword(password.value)) {
+    try {
+      const response = await fetch('http://localhost:8080/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.value,
+          password: password.value,
+        }),
+      });
 
-    if (validateEmail(email.value) && validatePassword(password.value)) {
-      try {
-        const response = await fetch('http://localhost:8080/auth', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: email.value,
-            password: password.value,
-          }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || '로그인 실패');
-        }
-
-        const serverResponse = await response.json();
-        console.log('서버 응답:', serverResponse);
-        localStorage.setItem('accessToken', serverResponse.data.accessToken);
-        localStorage.setItem('refreshToken', serverResponse.data.refreshToken);
-
-        alert('로그인 성공! 게시글 목록 페이지로 이동합니다.');
-
-        window.location.href = 'boards.html';
-
-      } catch (error) {
-        console.error('로그인 에러:', error);
-
-        alert('아이디 또는 비밀번호를 확인해주세요.');
-
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || '로그인 실패');
       }
-    } else {
+
+      const serverResponse = await response.json();
+      console.log('서버 응답:', serverResponse);
+      localStorage.setItem('accessToken', serverResponse.data.accessToken);
+      localStorage.setItem('refreshToken', serverResponse.data.refreshToken);
+
+      alert('로그인 성공! 게시글 목록 페이지로 이동합니다.');
+
+      window.location.href = 'boards.html';
+
+    } catch (error) {
+      console.error('로그인 에러:', error);
 
       alert('아이디 또는 비밀번호를 확인해주세요.');
 
     }
-  });
+  } else {
+
+    alert('아이디 또는 비밀번호를 확인해주세요.');
+
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  checkEmailInput();
+  checkPasswordInput();
+
+
 });
