@@ -6,7 +6,7 @@ const passwordHelper = document.getElementById('passwordHelper');
 const form = document.getElementById('loginForm');
 
 function validateEmail(value) {
-  const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const pattern = /^[A-Za-z.]+@[A-Za-z.]+\.[A-Za-z.]+$/;
   return pattern.test(value);
 }
 
@@ -87,10 +87,9 @@ form.addEventListener('submit', async (e) => {
         throw new Error(errorData.message || '로그인 실패');
       }
 
-      const serverResponse = await response.json();
-      console.log('서버 응답:', serverResponse);
-      localStorage.setItem('accessToken', serverResponse.data.accessToken);
-      localStorage.setItem('refreshToken', serverResponse.data.refreshToken);
+      const deserializaedResponse = await response.json();
+      localStorage.setItem('accessToken', deserializaedResponse.data.accessToken);
+      localStorage.setItem('refreshToken', deserializaedResponse.data.refreshToken);
 
       alert('로그인 성공! 게시글 목록 페이지로 이동합니다.');
 

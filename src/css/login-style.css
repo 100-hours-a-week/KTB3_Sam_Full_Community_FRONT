@@ -1,18 +1,30 @@
 /* 전체 배경 및 정렬 */
 body {
-  background-color: #F4F5F7;
   font-family: 'Noto Sans KR', sans-serif;
+  background-color: #F4F5F7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 0;
 }
 
 header {
+  width: 1920px;
+  height: 104px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
   position: relative;
   background-color: #F4F5F7;
   border-bottom: 1px solid black;
+}
+
+.title{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: 600;
 }
 
 /* 로그인 컨텐츠만 중앙 정렬 */
