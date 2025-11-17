@@ -1,18 +1,13 @@
-let page = 0;
-const limit = 5;
+import { apiFetch, logout } from "./auth.js";
 
-// ---- 더미 데이터 (fetch 대체용) ----
-async function fetchPosts(page) {
-  return Array.from({ length: limit }, (_, i) => ({
-    id: page * limit + i + 1,
-    title: "제목 " + (page * limit + i + 1) + " 입니다. 긴 제목이면 자동으로 줄어듭니다.",
-    likes: Math.floor(Math.random() * 20000),
-    comments: Math.floor(Math.random() * 300),
-    views: Math.floor(Math.random() * 100000),
-    author: "더미 작성자" + (i + 1),
-    createdAt: new Date().toISOString().slice(0, 19).replace('T', ' ')
-  }));
-}
+const size = 10;
+let page = 1;
+
+const wrtieBtn = document.getElementById("writeBtn");
+const profileMenu = document.getElementById('profileMenu');
+const profileIcon = document.getElementById('profileIcon');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const logoutBtn = document.getElementById('logoutBtn');
 
 // ---- 숫자 단위 포맷 (1k, 10k 등) ----
 function formatCount(num) {
@@ -22,31 +17,123 @@ function formatCount(num) {
   return num;
 }
 
-// ---- 게시글 렌더링 ----
+//프로필 이미지 
+async function loadUserProfile() {
+  try {
+    // 1. 유저 정보 조회
+    const userInfoRes = await apiFetch("http://localhost:8080/users", {
+      method: "GET"
+    });
+
+    if (!userInfoRes) return;
+
+    const user = await userInfoRes.json();
+    const profileImageId = user.data.profileImageId;
+
+    // 2. presigned GET URL 요청
+    const presignedRes = await fetch(`http://localhost:8080/images/${profileImageId}`, {
+      method: "GET",
+    });
+
+    const imageUrlResponse = await presignedRes.json();
+    const imagePresignedUrl = imageUrlResponse.data.imagePresignedUrl;
+
+    // 3. img src에 세팅
+    profileIcon.src = imagePresignedUrl;
+
+  } catch (err) {
+    console.error("프로필 이미지 로드 실패:", err);
+  }
+}
+
+//게시글 불러오기
+async function fetchPosts(page) {
+  const res = await apiFetch(`http://localhost:8080/boards?page=${page}&size=${size}`, {
+    method: "GET"
+  });
+
+  if (!res.ok) {
+    console.error("게시글 조회 실패");
+    return { posts: [], isLast: true };
+  }
+
+  const json = await res.json();
+  
+  return {
+    posts: json.data,
+    isLast: json.pageInfo.last
+  };
+}
+
 async function renderPosts() {
-  const posts = await fetchPosts(page);
+  const { posts, isLast } = await fetchPosts(page);
   const list = document.getElementById("postList");
 
   posts.forEach(post => {
     const card = document.createElement("div");
     card.className = "post-card";
+
     card.innerHTML = `
-      <div class="post-title">${post.title.length > 26 ? post.title.slice(0, 26) + "..." : post.title}</div>
-      <div class="post-meta">
-        <span>좋아요 ${formatCount(post.likes)} · 댓글 ${formatCount(post.comments)} · 조회수 ${formatCount(post.views)}</span>
-        <span>${post.createdAt}</span>
+      <div class="post-title">
+        ${post.title.length > 26 ? post.title.slice(0, 26) + "..." : post.title}
       </div>
+
+      <div class="post-meta">
+        <span>
+          좋아요 ${formatCount(post.likes)} · 
+          댓글 ${formatCount(post.commentsCount)} · 
+          조회수 ${formatCount(post.visitors)}
+        </span>
+        <span>${post.updateAt}</span>
+      </div>
+
       <div class="profile">
-        <img alt="profile" />
-        <span>${post.author}</span>
+        <img id="profile-${post.id}" src="" alt="profile">
+        <span>${post.nickname}</span>
       </div>
     `;
+
     card.addEventListener("click", () => {
-      alert(`게시글 상세보기: ${post.title}`);
+      window.location.href = `boards-detail.html?id=${post.id}`;
     });
+
     list.appendChild(card);
   });
+
+  loadProfileImagesInParallel(posts);
+
+  // 마지막 페이지면 더 이상 스크롤 이벤트 실행되지 않도록 처리
+  if (isLast) {
+    window.removeEventListener("scroll", handleScroll);
+  }
 }
+
+// 사진 병렬 요청
+async function loadProfileImagesInParallel(posts) {
+  const requests = posts.map(post => {
+    if (!post.profileImageId) return null;
+
+    return apiFetch(`http://localhost:8080/images/${post.profileImageId}`, {
+      method: "GET"
+    }).then(res => res?.json())
+      .then(json => ({ postId: post.id, url: json?.data?.imagePresignedUrl }))
+      .catch(() => null);
+  });
+
+  // 병렬로 모든 요청 처리
+  const results = await Promise.all(requests);
+
+  // DOM 반영
+  results.forEach(item => {
+    if (!item) return;
+
+    const imgTag = document.getElementById(`profile-${item.postId}`);
+    if (imgTag) {
+      imgTag.src = item.url;
+    }
+  });
+}
+
 
 // ---- 인피니티 스크롤 ----
 async function handleScroll() {
@@ -59,9 +146,34 @@ async function handleScroll() {
 
 window.addEventListener("scroll", handleScroll);
 
-document.getElementById("writeBtn").addEventListener("click", () => {
-  alert("게시글 작성 페이지로 이동합니다!");
+
+
+loadUserProfile();
+renderPosts();
+
+
+
+
+//프로필 이미지 
+profileIcon.addEventListener('click', (e) => {
+  e.stopPropagation(); // 클릭 버블링 방지
+  profileMenu.classList.toggle('active');
 });
 
-// ---- 초기 로드 ----
-renderPosts();
+
+
+// 드롭다운 화면 다른 곳 클릭 시 닫기
+document.addEventListener('click', (e) => {
+  if (!profileMenu.contains(e.target)) {
+    profileMenu.classList.remove('active');
+  }
+});
+
+// 로그아웃 버튼
+logoutBtn.addEventListener('click', () => logout);
+
+
+// 게시글 작성 이동 버튼
+wrtieBtn.addEventListener('click', () => {
+  window.location.href = "add-boards.html";
+})

@@ -199,7 +199,7 @@ passwordConfirm.addEventListener('input', () => {
 // 회원가입 폼 제출 시 유효성 검사
 signupForm.addEventListener("submit", async(eve) => {
   eve.preventDefault();
-  let presignedResponse
+  let presignedResponse;
   try {
     presignedResponse = await fetch('http://localhost:8080/images', {
       method: 'POST',
@@ -211,7 +211,7 @@ signupForm.addEventListener("submit", async(eve) => {
     console.error(e);
   }
   const deseralizedResponse = await presignedResponse.json();
-  const imageUploadUrl = deseralizedResponse.data.imageUploadUrl;
+  const imageUploadUrl = deseralizedResponse.data.imagePresignedUrl;
   const file = profileImage.files[0];
 
   const uploadResponse = await fetch(imageUploadUrl, {
@@ -227,7 +227,7 @@ signupForm.addEventListener("submit", async(eve) => {
     email: email.value.trim(),
     password: password.value,
     nickname: nickname.value.trim(),
-    profileImageId: 10
+    profileImageId: deseralizedResponse.data.imageId,
   };
 
 
@@ -240,9 +240,13 @@ signupForm.addEventListener("submit", async(eve) => {
       body: JSON.stringify(requestBody),
     });
 
-    const deserializaedResponse = await response.json();
+    const userRegisterResponse = await response.json();
+    const userId = userRegisterResponse.data.userId;
 
-    localStorage.setItem('userId', deserializaedResponse.data.userId);
+    localStorage.setItem('userId', userId);
+
+    alert('회원가입 성공! 로그인 페이지로 이동합니다.');
+    window.location.href = "login.html";
     
   } catch(e) {
     console.error(e);
