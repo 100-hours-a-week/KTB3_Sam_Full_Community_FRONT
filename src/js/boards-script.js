@@ -88,17 +88,20 @@ async function renderPosts() {
       </div>
 
       <div class="profile">
-        <img id="profile-${post.id}" src="" alt="profile">
+        <img id="profile-${post.boardId}" src="" alt="profile">
         <span>${post.nickname}</span>
       </div>
     `;
 
+    console.log("post.profileImageId:", post.profileImageId);
+
     card.addEventListener("click", () => {
-      window.location.href = `boards-detail.html?id=${post.id}`;
+      window.location.href = `boards-detail.html?id=${post.boardId}`;
     });
 
     list.appendChild(card);
   });
+  
 
   loadProfileImagesInParallel(posts);
 
@@ -110,26 +113,31 @@ async function renderPosts() {
 
 // 사진 병렬 요청
 async function loadProfileImagesInParallel(posts) {
+
+  // 요청 목록 생성 (imageId만 사용)
   const requests = posts.map(post => {
     if (!post.profileImageId) return null;
 
-    return apiFetch(`http://localhost:8080/images/${post.profileImageId}`, {
-      method: "GET"
-    }).then(res => res?.json())
-      .then(json => ({ postId: post.id, url: json?.data?.imagePresignedUrl }))
+    return fetch(`http://localhost:8080/images/${post.profileImageId}`)
+      .then(res => res.json())
+      .then(json => ({
+        imageId: post.profileImageId,
+        postId: post.boardId,   // ← 이건 프론트에서 매핑
+        url: json.data.imagePresignedUrl
+      }))
       .catch(() => null);
   });
 
-  // 병렬로 모든 요청 처리
+  // 병렬 처리
   const results = await Promise.all(requests);
 
-  // DOM 반영
+  // DOM 적용
   results.forEach(item => {
     if (!item) return;
 
-    const imgTag = document.getElementById(`profile-${item.postId}`);
-    if (imgTag) {
-      imgTag.src = item.url;
+    const img = document.getElementById(`profile-${item.postId}`);
+    if (img) {
+      img.src = item.url;
     }
   });
 }

@@ -1,27 +1,39 @@
 body {
+  font-family: "Noto Sans KR", sans-serif;
   background-color: #F4F5F7;
-  font-family: 'Noto Sans KR', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 0;
 }
 
 header {
+  width: 1920px;
+  height: 104px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
   position: relative;
-  background-color: #fff;
-  border-bottom: 1px solid #ccc;
+  background-color: #F4F5F7;
+  border-bottom: 1px solid black;
 }
 
 .back-btn {
   position: absolute;
   left: 50%;
   transform: translateX(calc(-100% - clamp(40px, 30vw, 210px)));
+  font-size: 22px;
   background: none;
   border: none;
-  font-size: 22px;
   cursor: pointer;
+}
+
+.title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: 600;
 }
 
 .profile-menu {
@@ -45,6 +57,8 @@ header {
 
 /* 가로 드롭다운 */
 .dropdown {
+  width: 130px;
+  height: 120px;
   display: none;
   position: absolute;
   right: 0;
@@ -57,7 +71,7 @@ header {
   min-width: 140px;
 }
 
-.dropdown a {
+.dropdown a{
   display: block;
   padding: 10px;
   color: black;
@@ -66,9 +80,26 @@ header {
   white-space: nowrap;
 }
 
-.dropdown a:hover {
+.dropdown a:hover{
   background-color: #eee;
 }
+
+.logout-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 0;
+  text-align: center;
+  font: inherit;
+  cursor: pointer;
+  color: black;
+}
+
+.logout-btn:hover {
+  background-color: #eee;
+}
+
 
 .profile-menu.active .dropdown {
   display: block;
@@ -85,23 +116,51 @@ header {
 .post-wrapper h2 {
   font-size: 24px;
   font-weight: 800;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  color: #222;
 }
 
 .post-form {
   display: flex;
   flex-direction: column;
-  width: 360px;
-  background: #fff;
-  padding: 25px 30px;
+  background: #F4F5F7;
+  padding: 40px 45px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
+/* 라벨 */
 .post-form label {
   font-weight: 600;
   font-size: 15px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+/* 제목 input */
+#title {
+  width: 460px;
+  height: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 12px;
+  font-size: 14px;
+}
+
+/* 내용 textarea */
+#content {
+  width: 460px;
+  height: 300px;      /* 더 크게 */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 12px;
+  font-size: 14px;
+  margin-bottom: 22px;
+  resize: none;
+}
+
+/* 이미지 업로드 */
+#image {
+  width: 130%;
+  margin-bottom: 22px;
 }
 
 .post-form input[type="text"],
@@ -131,6 +190,8 @@ header {
 
 /* 버튼 */
 #add-btn {
+  align-self: center;
+  width: 90%;
   background-color: #aca0eb;
   border: none;
   color: white;
@@ -144,4 +205,43 @@ header {
 #add-btn:hover {
   background-color: #7f6aee;
   transform: translateY(-1px);
+}
+
+/*이미지 미리보기*/
+#preview {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.preview-box {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.delete-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
