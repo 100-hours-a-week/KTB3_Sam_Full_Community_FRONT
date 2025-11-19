@@ -11,9 +11,9 @@
     <div class="profile-menu" id="profileMenu">
       <img src="" alt="프로필" class="profile-icon" id="profileIcon">
       <div class="dropdown" id="dropdownMenu">
-        <a href="#">회원정보수정</a>
-        <a href="#">비밀번호수정</a>
-        <a href="#">로그아웃</a>
+        <a href="edit-profile.html">회원정보수정</a>
+        <a href="edit-password.html">비밀번호수정</a>
+        <button id="logoutBtn" class="logout-btn">로그아웃</button>
       </div>
     </div>
   </header>
@@ -30,15 +30,16 @@
       <input type="file" id="fileInput" accept="image/*" hidden>
     </div>
 
-    <div class="form-section">
+    <form class="form-section" id="formSection">
       <label>이메일</label>
-      <input type="text" value="userexample@gmail.com" disabled class="email-field">
+      <input type="text" value="" disabled class="email-field" id="emailField">
 
       <label>닉네임</label>
       <input type="text" id="nickname" placeholder="닉네임을 입력해주세요.">
+      <p id="nicknameHelper" class="helper-text"></p>
 
-      <button id="submitBtn" class="submit-btn">수정하기</button>
-    </div>
+      <button id="submitBtn" class="submit-btn" type="submit">수정하기</button>
+    </form>
     <button id="withdrawBtn" class="withdraw-btn">회원 탈퇴</button>
 
     <div id="toast">수정 완료</div>
@@ -56,7 +57,8 @@
     </div>
   </div>
 
-  <script src="js/edit-profile-script.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/edit-profile-script.js"></script>
 </body>
 </html>
 
