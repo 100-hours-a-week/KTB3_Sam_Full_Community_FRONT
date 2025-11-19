@@ -131,23 +131,38 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// === 수정하기 ===
-document.getElementById('submitBtn').addEventListener('click', () => {
-  alert('수정 완료');
-});
 
 // === 회원 탈퇴 모달 ===
-document.getElementById('withdrawBtn').addEventListener('click', () => {
+withdrawBtn.addEventListener('click', () => {
   modalOverlay.style.display = 'flex';
 });
 
-document.getElementById('cancelBtn').addEventListener('click', () => {
+cancelBtn.addEventListener('click', () => {
   modalOverlay.style.display = 'none';
 });
 
-document.getElementById('confirmBtn').addEventListener('click', () => {
-  alert('회원 탈퇴가 완료되었습니다.');
-  modalOverlay.style.display = 'none';
+confirmBtn.addEventListener('click', async () => {
+  console.log("확인 버튼 클릭됨");
+  try {
+    // 회원탈퇴 요청
+    const response = await apiFetch("http://localhost:8080/users", {
+      method: "DELETE"
+    });
+
+    if (!response || !response.ok) {
+      console.error("회원탈퇴 실패");
+      modalOverlay.style.display = 'none';
+      return;
+    }
+
+    localStorage.clear();
+
+    modalOverlay.style.display = 'none';
+    window.location.href = "login.html";
+
+  } catch (e) {
+    console.error("회원탈퇴 요청 오류:", e);
+  }
 });
 
 // === 프로필 업로드 ===
@@ -245,7 +260,7 @@ formSection.addEventListener('submit', async (e) => {
   setTimeout(() => {
     toast.classList.remove('show')
     window.location.href = "login.html";
-  }, 500);
+  }, 1000);
   
 });
 

@@ -1,109 +1,153 @@
-const password = document.getElementById('password');
-const checkPassword = document.getElementById('check-password');
-const form = document.querySelector('.eidt-password-form');
-const editBtn = document.querySelector('.edit-button');
+import { apiFetch, logout } from "./auth.js";
 
-// 🔹 헬퍼 텍스트를 동적으로 추가할 영역
-function showHelperText(input, message) {
-  let helper = input.nextElementSibling;
-  if (!helper || !helper.classList.contains('helper-text')) {
-    helper = document.createElement('p');
-    helper.classList.add('helper-text');
-    helper.style.color = 'red';
-    helper.style.fontSize = '12px';
-    helper.style.margin = '-10px 0 12px 0';
-    input.insertAdjacentElement('afterend', helper);
-  }
-  helper.textContent = message;
-}
+const profileMenu = document.getElementById('profileMenu');
+const profileIcon = document.getElementById('profileIcon');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const logoutBtn = document.getElementById('logoutBtn');
 
-function clearHelperText(input) {
-  const helper = input.nextElementSibling;
-  if (helper && helper.classList.contains('helper-text')) {
-    helper.remove();
-  }
-}
+const passwordInput = document.getElementById("password");
+const passwordCheckInput = document.getElementById("passwordCheck");
 
-// 🔹 비밀번호 유효성 검사 정규식
-function validatePassword(pw) {
+const passwordHelper = document.getElementById("passwordHelper");
+const passwordCheckHelper = document.getElementById("passwordCheckHelper");
+
+const submitBtn = document.getElementById("submitBtn");
+const toast = document.getElementById("toast");
+const passwordForm = document.getElementById("passwordForm");
+
+
+// 비밀번호 유효성 검사
+function validatePassword() {
+  const value = passwordInput.value.trim();
+
   const regex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",<.>/?]).{8,20}$/;
-  return regex.test(pw);
-}
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=]).{8,20}$/;
 
-// 🔹 실시간 유효성 검사
-function checkValidity() {
-  let valid = true;
-
-  // 비밀번호 입력 안 했을 경우
-  if (!password.value.trim()) {
-    showHelperText(password, '*비밀번호를 입력해주세요.');
-    valid = false;
-  } else if (!validatePassword(password.value)) {
-    showHelperText(
-      password,
-      '*비밀번호는 8자 이상, 20자 이하이며 대문자, 소문자, 숫자, 특수문자를 모두 포함해야 합니다.'
-    );
-    valid = false;
-  } else {
-    clearHelperText(password);
+  if (value === "") {
+    passwordHelper.textContent = "*비밀번호를 입력해주세요.";
+    return false;
+  }
+  if (!regex.test(value)) {
+    passwordHelper.textContent =
+      "*비밀번호는 8자 이상, 20자 이하이며, 대문자/소문자/숫자/특수문자를 포함해야 합니다.";
+    return false;
   }
 
-  // 비밀번호 확인 검사
-  if (!checkPassword.value.trim()) {
-    showHelperText(checkPassword, '*비밀번호를 한번 더 입력해주세요.');
-    valid = false;
-  } else if (checkPassword.value !== password.value) {
-    showHelperText(checkPassword, '*비밀번호와 다릅니다.');
-    valid = false;
-  } else {
-    clearHelperText(checkPassword);
-  }
-
-  // 🔹 버튼 활성화/비활성화
-  editBtn.disabled = !valid;
-  editBtn.style.backgroundColor = valid ? '#7f6aee' : '#aca0eb';
-
-  return valid;
+  passwordHelper.textContent = "";
+  return true;
 }
 
-password.addEventListener('input', checkValidity);
-checkPassword.addEventListener('input', checkValidity);
 
-// 🔹 Toast 메시지
-function showToast(message) {
-  let toast = document.createElement('div');
-  toast.textContent = message;
-  toast.style.position = 'absolute';
-  toast.style.bottom = '-60px';
-  toast.style.left = '50%';
-  toast.style.transform = 'translateX(-50%)';
-  toast.style.background = '#7f6aee';
-  toast.style.color = '#fff';
-  toast.style.padding = '10px 24px';
-  toast.style.borderRadius = '20px';
-  toast.style.fontSize = '14px';
-  toast.style.fontWeight = '500';
-  toast.style.opacity = '0';
-  toast.style.transition = 'opacity 0.5s';
-  form.appendChild(toast);
+// 비밀번호 확인 검사
+function validatePasswordCheck() {
+  if (passwordCheckInput.value.trim() === "") {
+    passwordCheckHelper.textContent = "*비밀번호를 한번 더 입력해주세요.";
+    return false;
+  }
+  if (passwordCheckInput.value !== passwordInput.value) {
+    passwordCheckHelper.textContent = "*비밀번호와 다릅니다.";
+    return false;
+  }
 
-  requestAnimationFrame(() => (toast.style.opacity = '1'));
+  passwordCheckHelper.textContent = "";
+  return true;
+}
+
+
+// 전체 입력 확인해서 버튼 활성화
+function updateButtonState() {
+  if (validatePassword() && validatePasswordCheck()) {
+    submitBtn.disabled = false;
+    submitBtn.classList.add("enabled");
+  } else {
+    submitBtn.disabled = true;
+    submitBtn.classList.remove("enabled");
+  }
+}
+
+//프로필 이미지 
+async function loadUserProfile() {
+  try {
+    // 1. 유저 정보 조회
+    const userInfoRes = await apiFetch("http://localhost:8080/users", {
+      method: "GET"
+    });
+
+    if (!userInfoRes) return;
+
+    const user = await userInfoRes.json();
+    const profileImageId = user.data.profileImageId;
+
+    // 2. presigned GET URL 요청
+    const presignedRes = await fetch(`http://localhost:8080/images/${profileImageId}`, {
+      method: "GET",
+    });
+
+    const imageUrlResponse = await presignedRes.json();
+    const imagePresignedUrl = imageUrlResponse.data.imagePresignedUrl;
+
+    // 3. img src에 세팅
+    profileIcon.src = imagePresignedUrl;
+    previewImg.src = imagePresignedUrl;
+
+    emailField.value = user.data.email;
+    originalNickname = user.data.nickname;
+
+  } catch (err) {
+    console.error("프로필 이미지 로드 실패:", err);
+  }
+}
+
+
+
+loadUserProfile();
+
+
+// 이벤트 등록
+passwordInput.addEventListener("input", updateButtonState);
+passwordCheckInput.addEventListener("input", updateButtonState);
+
+
+// 폼 제출
+passwordForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!validatePassword() || !validatePasswordCheck()) return;
+
+  const body = {
+    password: passwordInput.value,
+    checkPassword: passwordCheckInput.value
+  };
+
+  const res = await apiFetch("http://localhost:8080/users/password", {
+    method: "PATCH",
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    console.log("비밀번호 변경 실패");
+    return;
+  }
+
+  // 성공 토스트 표시
+  toast.classList.add("show");
 
   setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 500);
-  }, 3000);
-}
+    toast.classList.remove('show')
+    window.location.href = "login.html";
+  }, 1000);
+});
 
-// 🔹 폼 제출 시
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  if (checkValidity()) {
-    showToast('수정 완료');
-    password.value = '';
-    checkPassword.value = '';
-    editBtn.disabled = true;
-    editBtn.style.backgroundColor = '#aca0eb';
+profileIcon.addEventListener('click', (e) => {
+  e.stopPropagation(); // 클릭 버블링 방지
+  profileMenu.classList.toggle('active');
+});
+
+// 화면 다른 곳 클릭 시 닫기
+document.addEventListener('click', (e) => {
+  if (!profileMenu.contains(e.target)) {
+    profileMenu.classList.remove('active');
   }
 });
+
+logoutBtn.addEventListener('click', () => logout);
