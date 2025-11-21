@@ -88,7 +88,6 @@ async function loadUserProfile() {
 
     // 3. img src에 세팅
     profileIcon.src = imagePresignedUrl;
-    previewImg.src = imagePresignedUrl;
 
     emailField.value = user.data.email;
     originalNickname = user.data.nickname;
