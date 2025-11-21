@@ -12,12 +12,6 @@ const form  = document.getElementById("postForm");
 const contentHelper = document.getElementById("content-helper");
 
 
-function clearHelperTexts() {
-  titleHelper.textContent = "";
-  contentHelper.textContent = "";
-  imageHelper.textContent = "";
-}
-
 //이미지 미리보기
 function renderPreview() {
   preview.innerHTML = ""; // 초기화
