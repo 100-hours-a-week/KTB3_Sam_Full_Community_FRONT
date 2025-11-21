@@ -414,11 +414,6 @@ async function loadComments() {
   const list = document.getElementById("comment-list");
 
   if (!comments || comments.length === 0) {
-    if (!commentLast) {
-      list.innerHTML += `
-        <li class="no-comment">등록된 댓글이 없습니다.</li>
-      `;
-    }
     commentLast = last;
     return;
   }
@@ -492,8 +487,7 @@ commentDeleteConfirm.addEventListener("click", async () => {
 
   const current = parseInt(document.getElementById("commentsNumberCount").textContent);
   updateCommentCount(current - 1);
-
-  await loadComments();
+  
 });
 
 

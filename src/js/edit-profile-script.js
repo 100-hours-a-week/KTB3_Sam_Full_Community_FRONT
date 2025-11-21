@@ -238,12 +238,10 @@ formSection.addEventListener('submit', async (e) => {
     }
   }
 
-  // 요청 바디 구성 (이미지 변경 없으면 포함 X)
   const updateBody = {
     nickname: nicknameInput.value,
     profileImageId: profileImageId
   };
-  console.log(updateBody);
 
   // PUT 요청
   const res = await apiFetch("http://localhost:8080/users", {
