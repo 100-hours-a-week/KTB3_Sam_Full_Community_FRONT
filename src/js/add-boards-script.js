@@ -163,7 +163,6 @@ form.addEventListener("submit", async (e) => {
 
   const title = document.getElementById("title").value.trim();
   const content = document.getElementById("content").value.trim();
-  const files = Array.from(document.getElementById("image").files);
 
   if (!title || !content) {
     contentHelper.textContent = "*제목, 내용을 모두 작성해주세요.";
@@ -174,7 +173,7 @@ form.addEventListener("submit", async (e) => {
 
 
   // 1) 이미지 업로드
-  const imageIds = await uploadAllImages(files);
+  const imageIds = await uploadAllImages(selectedFiles);
 
   // 2) 게시글 작성 요청
   const boardRes = await apiFetch("http://localhost:8080/boards", {
