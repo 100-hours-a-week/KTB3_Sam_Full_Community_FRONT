@@ -1,234 +1,591 @@
-// --------------------
-// Mock Fetch API
-// --------------------
-async function fetchPostData() {
-  // 실제에선 fetch(`/api/posts/${id}`) 이런 식으로 대체
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: 1,
-        title: "제목 1",
-        author: "더미 작성자1",
-        date: "2025-01-01 00:00:00",
-        content: "아무 말 대잔치의 예시 게시글입니다.",
-        imageUrl: "https://placehold.co/600x400",
-        likes: 123,
-        views: 456,
-        comments: [
-          { id: 1, author: "더미 작성자1", date: "2025-01-01 00:00:00", text: "첫 댓글이에요!" },
-          { id: 2, author: "더미 작성자2", date: "2025-01-02 00:00:00", text: "두 번째 댓글입니다." },
-        ],
-      });
-    }, 500);
+import { apiFetch, logout } from "./auth.js";
+
+const commentSize = 10;
+let commentPage = 1;
+let commentLast = false;
+
+let currentImageIndex = 0;
+let sliderImages = []; // presigned URL 저장
+
+
+const profileMenu = document.getElementById('profileMenu');
+const profileIcon = document.getElementById('profileIcon');
+const dropdownMenu = document.getElementById('dropdownMenu');
+const logoutBtn = document.getElementById('logoutBtn');
+const authorImg = document.getElementById("authorImg");
+
+const urlParams = new URLSearchParams(window.location.search);
+const stringBoardId = urlParams.get("id");
+const boardId = parseInt(stringBoardId, 10);
+
+const commentInput = document.getElementById("comment-input");
+const commentSubmit = document.getElementById("comment-submit");
+const commentList = document.getElementById("comment-list");
+
+const commentDeleteModal = document.getElementById("commentDeleteModal");
+const commentDeleteCancel = commentDeleteModal.querySelector(".cancel");
+const commentDeleteConfirm = commentDeleteModal.querySelector(".confirm");
+
+const editBtn = document.getElementById("edit-btn");
+
+const postDeleteModal = document.getElementById("postDeleteModal");
+const postCancelBtn = postDeleteModal.querySelector(".cancel");
+const postConfirmBtn = postDeleteModal.querySelector(".confirm");
+const deletePostBtn = document.getElementById("delete-btn");
+
+
+let pendingDeleteCommentId = null;
+
+
+// ---- 숫자 단위 포맷 (1k, 10k 등) ----
+function formatCount(num) {
+  if (num >= 100000) return Math.floor(num / 100000) + "00k";
+  if (num >= 10000) return Math.floor(num / 10000) + "0k";
+  if (num >= 1000) return Math.floor(num / 1000) + "k";
+  return num;
+}
+
+function brToNewline(text) {
+  return text.replace(/<br\s*\/?>/gi, "\n");
+}
+
+function newlineToBr(text) {
+  return text.replace(/\n/g, "<br>");
+}
+
+
+function renderBoard(deserializedBoard) {
+  document.getElementById("post-title").textContent = deserializedBoard.title;
+  document.getElementById("post-author").textContent = deserializedBoard.nickname;
+  document.getElementById("post-date").textContent = deserializedBoard.updateAt;
+  document.getElementById("post-body").textContent = deserializedBoard.content;
+  document.getElementById("likesCount").textContent = deserializedBoard.likes;
+  document.getElementById("visitorsCount").textContent = formatCount(deserializedBoard.visitors);
+  document.getElementById("commentsNumberCount").textContent = formatCount(deserializedBoard.commentsCount);
+}
+
+function updateLikeUI(isLiked) {
+  const likeBox = document.getElementById("likes");
+
+  if (isLiked) {
+    likeBox.classList.add("liked");
+  } else {
+    likeBox.classList.remove("liked");
+  }
+}
+
+async function refreshCommentSection() {
+  commentList.innerHTML = "";
+  commentPage = 1;
+  commentLast = false;
+  await loadComments();
+}
+
+function updateCommentCount(newCount) {
+  document.getElementById("commentsNumberCount").textContent = newCount;
+}
+
+function blockScrollEvent(e) {
+  e.preventDefault();
+}
+
+
+async function fetchIsLiked(boardId) {
+  const res = await apiFetch(`http://localhost:8080/boards/${boardId}/like`, {
+    method: "GET"
   });
+
+  if (!res.ok) {
+    console.error("좋아요 여부 조회 실패");
+    return false;
+  }
+
+  const json = await res.json();
+  return json.data.isLiked;
 }
 
-// --------------------
-// 전역 상태
-// --------------------
-let postData = null;
-let editingCommentId = null;
+async function toggleLike(boardId, isLikedNow) {
+  const method = isLikedNow ? "DELETE" : "POST";
 
-// --------------------
-// 초기 로드
-// --------------------
-document.addEventListener("DOMContentLoaded", async () => {
-  postData = await fetchPostData();
-  renderPost(postData);
-  renderComments(postData.comments);
-});
+  const res = await apiFetch(`http://localhost:8080/boards/${boardId}/like`, {
+    method
+  });
 
-// --------------------
-// 게시글 렌더링
-// --------------------
-function renderPost(data) {
-  document.getElementById("post-title").textContent = data.title;
-  document.getElementById("post-author").textContent = data.author;
-  document.getElementById("post-date").textContent = data.date;
-  document.getElementById("post-body").textContent = data.content;
-  document.getElementById("post-image").src = data.imageUrl;
+  return res.ok;
 }
 
-// --------------------
-// 댓글 렌더링
-// --------------------
-function renderComments(comments) {
-  const list = document.getElementById("comment-list");
-  list.innerHTML = "";
+function attachLikeEvent(boardId) {
+  const likeBox = document.getElementById("likes");
 
-  comments.forEach((c) => {
-    const li = document.createElement("li");
-    li.classList.add("comment-item");
-    li.setAttribute("data-id", c.id);
+  likeBox.addEventListener("click", async () => {
+    const isLikedNow = likeBox.classList.contains("liked");
 
-    if (editingCommentId === c.id) {
-      // 수정 모드
-      li.innerHTML = `
-        <div class="comment-top">
-          <div class="comment-info">
-            <img src="https://placehold.co/35x35" alt="프로필" class="comment-profile" />
-            <span class="comment-author"><strong>${c.author}</strong></span>
-            <span class="comment-date">${c.date}</span>
-          </div>
-          <div class="comment-actions">
-            <button class="save-edit">저장</button>
-            <button class="cancel-edit">취소</button>
-          </div>
-        </div>
-        <textarea class="edit-textarea">${c.text}</textarea>
-      `;
-    } else {
-      // 일반 모드
-      li.innerHTML = `
-        <div class="comment-top">
-          <div class="comment-info">
-            <img src="https://placehold.co/35x35" alt="프로필" class="comment-profile" />
-            <span class="comment-author"><strong>${c.author}</strong></span>
-            <span class="comment-date">${c.date}</span>
-          </div>
-          <div class="comment-actions">
-            <button class="edit">수정</button>
-            <button class="delete">삭제</button>
-          </div>
-        </div>
-        <div class="comment-text">${c.text}</div>
-      `;
+    const success = await toggleLike(boardId, isLikedNow);
+    if (!success) {
+      alert("좋아요 요청 실패");
+      return;
     }
 
-    list.appendChild(li);
-  });
+    const newLiked = !isLikedNow;
+    updateLikeUI(newLiked);
 
-  attachCommentEvents();
+    // 좋아요 수 다시 반영
+    const countEl = document.getElementById("likesCount");
+    let count = parseInt(countEl.textContent);
+
+    countEl.textContent = newLiked ? count + 1 : count - 1;
+  });
 }
 
-// --------------------
-// 댓글 이벤트 연결
-// --------------------
-function attachCommentEvents() {
-  // 수정 버튼
-  document.querySelectorAll(".comment-actions .edit").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const id = parseInt(e.target.closest(".comment-item").dataset.id);
-      editingCommentId = id;
-      renderComments(postData.comments);
-    });
+
+async function loadBoardImages(boardImageIds) {
+  if (!boardImageIds || boardImageIds.length === 0) return;
+
+  // presigned URL 병렬 요청
+  const requests = boardImageIds.map(id =>
+    fetch(`http://localhost:8080/images/${id}`)
+      .then(res => res.json())
+      .then(json => json.data.imagePresignedUrl)
+  );
+
+  sliderImages = await Promise.all(requests);
+
+  renderSlider(sliderImages);
+}
+
+
+// 실제 슬라이더 그리기
+function renderSlider(urls) {
+  const imageArea = document.getElementById("imageSlider");
+  const dotsArea = document.getElementById("sliderDots");
+
+  // 방어
+  if (!imageArea || !dotsArea) {
+    console.error("슬라이더 DOM을 찾을 수 없습니다");
+    return;
+  }
+
+  imageArea.innerHTML = `
+    <img id="sliderImage" class="detail-image" src="${urls[0]}" />
+  `;
+
+  dotsArea.innerHTML = urls
+    .map((_, i) => `<span class="dot ${i === 0 ? "active" : ""}" data-index="${i}"></span>`)
+    .join("");
+
+  // 클릭하면 다음 이미지로 이동
+  document.getElementById("sliderImage").addEventListener("click", () => {
+    currentImageIndex = (currentImageIndex + 1) % urls.length;
+    updateSlider(urls);
   });
 
-  // 삭제 버튼
-  document.querySelectorAll(".comment-actions .delete").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const id = parseInt(e.target.closest(".comment-item").dataset.id);
-      openModal("commentDeleteModal", id);
+  // dot 클릭 이벤트
+  document.querySelectorAll(".dot").forEach(dot => {
+    dot.addEventListener("click", (e) => {
+      currentImageIndex = parseInt(e.target.dataset.index);
+      updateSlider(urls);
     });
   });
+}
 
-  // 수정 저장
-  document.querySelectorAll(".save-edit").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const li = e.target.closest(".comment-item");
-      const id = parseInt(li.dataset.id);
-      const newText = li.querySelector(".edit-textarea").value.trim();
-      if (newText) {
-        const comment = postData.comments.find((c) => c.id === id);
-        comment.text = newText;
-        editingCommentId = null;
-        renderComments(postData.comments);
+function updateSlider(urls) {
+  const sliderImage = document.getElementById("sliderImage");
+  sliderImage.src = urls[currentImageIndex];
+
+  document.querySelectorAll(".dot").forEach((d, i) => {
+    d.classList.toggle("active", i === currentImageIndex);
+  });
+}
+
+
+//프로필 이미지 
+async function loadUserProfile() {
+  try {
+    // 1. 유저 정보 조회
+    const userInfoRes = await apiFetch("http://localhost:8080/users", {
+      method: "GET"
+    });
+
+    if (!userInfoRes) return;
+
+    const user = await userInfoRes.json();
+    const profileImageId = user.data.profileImageId;
+
+    // 2. presigned GET URL 요청
+    const presignedRes = await fetch(`http://localhost:8080/images/${profileImageId}`, {
+      method: "GET",
+    });
+
+    const imageUrlResponse = await presignedRes.json();
+    const imagePresignedUrl = imageUrlResponse.data.imagePresignedUrl;
+
+    // 3. img src에 세팅
+    profileIcon.src = imagePresignedUrl;
+
+  } catch (err) {
+    console.error("프로필 이미지 로드 실패:", err);
+  }
+}
+
+
+async function loadBoardProfileImage(profileImageId) {
+  try {
+      const presignedRes = await fetch(`http://localhost:8080/images/${profileImageId}`, {
+        method: "GET",
+      });
+
+      const imageUrlResponse = await presignedRes.json();
+      const imagePresignedUrl = imageUrlResponse.data.imagePresignedUrl;
+
+      // 3. img src에 세팅
+      authorImg.src = imagePresignedUrl;
+  } catch (e) {
+      console.error(e);
+  }
+}
+
+async function loadBoard() {
+  try {
+    const boardDetailRes = await apiFetch(`http://localhost:8080/boards/${boardId}`, {
+      method: "GET"
+    });
+    
+    const body = await boardDetailRes.json();
+
+    const deserializedBoard = body.data;
+
+    renderBoard(deserializedBoard);
+    await loadBoardImages(deserializedBoard.boardImageIds);
+    await loadBoardProfileImage(deserializedBoard.profileImageId);
+
+    const isLiked = await fetchIsLiked(boardId);
+    updateLikeUI(isLiked);
+
+    attachLikeEvent(boardId);
+
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function attachCommentItemEvents(li, commentId) {
+  const editBtn = li.querySelector(".edit-btn");
+  const deleteBtn = li.querySelector(".delete-btn");
+  const textDiv = li.querySelector(".comment-text");
+  const textarea = li.querySelector(".edit-area");
+  const editButtons = li.querySelector(".edit-buttons");
+
+  // 수정
+  editBtn.addEventListener("click", () => {
+    textDiv.style.display = "none";
+    textarea.style.display = "block";
+    editButtons.style.display = "flex"
+
+    li.querySelector(".top-actions").style.display = "none";
+  });
+
+  // 취소
+  li.querySelector(".cancel-edit").addEventListener("click", () => {
+    textarea.value = textDiv.textContent;
+    textDiv.style.display = "block";
+    textarea.style.display = "none";
+    editButtons.style.display = "none";
+
+    li.querySelector(".top-actions").style.display = "flex";
+  });
+
+  // 저장 (=수정 API 호출)
+  li.querySelector(".save-edit").addEventListener("click", async () => {
+    const newText = textarea.value.trim();
+    if (!newText) return alert("내용을 입력하세요");
+
+    const res = await apiFetch(
+      `http://localhost:8080/comments/${commentId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ content: newText }),
       }
-    });
+    );
+
+    if (!res.ok) return alert("수정 실패");
+
+    textDiv.innerHTML = newText.replace(/\n/g, "<br>");
+
+    textDiv.style.display = "block";
+    textarea.style.display = "none";
+    editButtons.style.display = "none";
+    li.querySelector(".top-actions").style.display = "flex";
+
+    await refreshCommentSection();
   });
 
-  // 수정 취소
-  document.querySelectorAll(".cancel-edit").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      editingCommentId = null;
-      renderComments(postData.comments);
-    });
+
+  deleteBtn.addEventListener("click", () => {
+    pendingDeleteCommentId = commentId;
+    commentDeleteModal.style.display = "flex";
+    document.addEventListener("wheel", blockScrollEvent, { passive: false });
   });
+
+  editBtn.addEventListener("click", () => {
+    textDiv.style.display = "none";
+    textarea.style.display = "block";
+    editButtons.style.display = "flex";
+
+    // textarea 자동 높이
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+  });
+
+  textarea.addEventListener("input", () => {
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+  });
+  
 }
 
-// --------------------
-// 댓글 등록
-// --------------------
-// --------------------
-// 댓글 등록
-// --------------------
-const input = document.getElementById("comment-input");
-const submit = document.getElementById("comment-submit");
 
-input.addEventListener("input", () => {
-  const hasText = input.value.trim().length > 0;
-  if (hasText) {
-    submit.classList.add("active");
-    submit.removeAttribute("disabled");
+function appendCommentItem(comment) {
+  const li = document.createElement("li");
+  li.classList.add("comment-item");
+  li.setAttribute("data-id", comment.commentId);
+
+  li.innerHTML = `
+    <div class="comment-top">
+      <div class="comment-info">
+        <img src="${comment.profileImageUrl}" class="comment-profile"/>
+        <span class="comment-author"><strong>${comment.nickname}</strong></span>
+        <span class="comment-date">${comment.updateAt}</span>
+      </div>
+
+      <div class="comment-actions top-actions">
+        <button class="edit-btn">수정</button>
+        <button class="delete-btn">삭제</button>
+      </div>
+    </div>
+
+    <div class="comment-text">${newlineToBr(comment.content)}</div>
+
+    <textarea class="edit-area" style="display:none;">${brToNewline(comment.content)}</textarea>
+
+    <div class="edit-buttons" style="display:none;">
+      <button class="save-edit">저장</button>
+      <button class="cancel-edit">취소</button>
+    </div>
+  `;
+
+  attachCommentItemEvents(li, comment.commentId);
+  return li;
+}
+
+async function handleCommentScroll() {
+  const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+  if (scrollTop + clientHeight >= scrollHeight - 5) {
+    if (commentLast) return;
+
+    commentPage++;
+    await loadComments();
+  }
+}
+
+async function fetchComments(boardId, page) {
+  const res = await apiFetch(`http://localhost:8080/boards/${boardId}/comments?page=${page}&size=${commentSize}`, {
+    method: "GET"
+  });
+
+  if (!res.ok) {
+    console.error("댓글 조회 실패");
+    return { comments: [], last: true };
+  }
+
+  const json = await res.json();
+
+  return {
+    comments: json.data,
+    last: json.pageInfo.last
+  };
+}
+
+
+
+
+async function loadComments() {
+  const { comments, last } = await fetchComments(boardId, commentPage);
+  const list = document.getElementById("comment-list");
+
+  if (!comments || comments.length === 0) {
+    if (!commentLast) {
+      list.innerHTML += `
+        <li class="no-comment">등록된 댓글이 없습니다.</li>
+      `;
+    }
+    commentLast = last;
+    return;
+  }
+
+  // Presigned URL 병렬 요청
+  const requests = comments.map(c => {
+    if (!c.profileImageId) {
+      return Promise.resolve({
+        ...c,
+        profileImageUrl: null
+      });
+    }
+
+    return fetch(`http://localhost:8080/images/${c.profileImageId}`)
+      .then(res => res.json())
+      .then(json => ({
+        ...c,
+        profileImageUrl: json.data.imagePresignedUrl
+      }))
+      .catch(() => ({
+        ...c,
+        profileImageUrl: null
+      }));
+  });
+
+  const results = await Promise.all(requests);
+
+  results.forEach(c => {
+    list.appendChild(appendCommentItem(c));
+  });
+
+  // 페이징 처리
+  commentLast = last;
+  if (commentLast) {
+    window.removeEventListener("scroll", handleCommentScroll);
+  }
+}
+
+
+loadUserProfile();
+loadBoard();
+loadComments();
+
+
+
+
+commentDeleteCancel.addEventListener("click", () => {
+  pendingDeleteCommentId = null;
+  commentDeleteModal.style.display = "none";
+  document.removeEventListener("wheel", blockScrollEvent);
+});
+
+commentDeleteConfirm.addEventListener("click", async () => {
+  if (!pendingDeleteCommentId) return;
+
+  const res = await apiFetch(
+    `http://localhost:8080/comments/${pendingDeleteCommentId}`,
+    { method: "DELETE" }
+  );
+
+  if (!res.ok) {
+    alert("댓글 삭제 실패");
+    return;
+  }
+
+  // 모달 닫기
+  commentDeleteModal.style.display = "none";
+  document.removeEventListener("wheel", blockScrollEvent);
+
+  await refreshCommentSection();
+
+  const current = parseInt(document.getElementById("commentsNumberCount").textContent);
+  updateCommentCount(current - 1);
+
+  await loadComments();
+});
+
+
+commentInput.addEventListener("input", () => {
+  const text = commentInput.value.trim();
+  if (text.length > 0) {
+    commentSubmit.classList.add("active");
+    commentSubmit.removeAttribute("disabled");
   } else {
-    submit.classList.remove("active");
-    submit.setAttribute("disabled", "true");
+    commentSubmit.classList.remove("active");
+    commentSubmit.setAttribute("disabled", "true");
   }
 });
 
-submit.addEventListener("click", (e) => {
-  e.preventDefault();
-  if (submit.hasAttribute("disabled")) return;
+commentSubmit.addEventListener("click", async () => {
+  const content = commentInput.value.trim();
+  if (!content) return;
 
-  const newComment = {
-    id: Date.now(),
-    author: "더미 작성자3",
-    date: new Date().toISOString().slice(0, 19).replace("T", " "),
-    text: input.value.trim(),
-  };
+  const res = await apiFetch(`http://localhost:8080/boards/${boardId}/comments`, {
+    method: "POST",
+    body: JSON.stringify({ content })
+  });
 
-  postData.comments.push(newComment);
-  renderComments(postData.comments);
+  if (!res.ok) {
+    alert("댓글 등록 실패");
+    return;
+  }
 
-  // 입력 초기화
-  input.value = "";
-  submit.classList.remove("active");
-  submit.setAttribute("disabled", "true");
+  await refreshCommentSection();
+
+  const current = parseInt(document.getElementById("commentsNumberCount").textContent);
+  updateCommentCount(current + 1);
+
+  commentInput.value = "";
+  commentSubmit.classList.remove("active");
+  commentSubmit.setAttribute("disabled", "true");
+
 });
 
+window.addEventListener("scroll", handleCommentScroll);
 
+//뒤로가기 버튼
+backBtn.addEventListener("click", () => {
+  history.back();
+});
 
-// --------------------
-// 모달 제어
-// --------------------
-let currentDeleteId = null;
+//프로필 이미지 
+profileIcon.addEventListener('click', (e) => {
+  e.stopPropagation(); // 클릭 버블링 방지
+  profileMenu.classList.toggle('active');
+});
 
-function openModal(id, commentId = null) {
-  document.getElementById(id).style.display = "flex";
-  currentDeleteId = commentId;
-}
+// 드롭다운 화면 다른 곳 클릭 시 닫기
+document.addEventListener('click', (e) => {
+  if (!profileMenu.contains(e.target)) {
+    profileMenu.classList.remove('active');
+  }
+});
 
-function closeModal(id) {
-  document.getElementById(id).style.display = "none";
-  currentDeleteId = null;
-}
+// 로그아웃 버튼
+logoutBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  logout();
+});
 
-// 모달 버튼
-document.querySelectorAll(".cancel").forEach((btn) =>
-  btn.addEventListener("click", () => {
-    closeModal("commentDeleteModal");
-  })
-);
+editBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  window.location.href = `edit-boards.html?id=${boardId}`;
+})
 
-document.querySelectorAll(".confirm").forEach((btn) =>
-  btn.addEventListener("click", () => {
-    if (currentDeleteId) {
-      postData.comments = postData.comments.filter((c) => c.id !== currentDeleteId);
-      renderComments(postData.comments);
-    }
-    closeModal("commentDeleteModal");
-  })
-);
+deletePostBtn.addEventListener('click', () => {
+  postDeleteModal.style.display = "flex";
+  document.addEventListener("wheel", blockScrollEvent, { passive: false });
+})
 
+postCancelBtn.addEventListener('click', () => {
+  postDeleteModal.style.display = "none";
+  document.removeEventListener("wheel", blockScrollEvent);
+})
 
-document.getElementById("delete-btn").addEventListener("click", () => openModal("postDeleteModal"));
-document.querySelectorAll(".cancel").forEach(btn => btn.addEventListener("click", () => {
-  closeModal("postDeleteModal");
-  closeModal("commentDeleteModal");
-}));
+postConfirmBtn.addEventListener('click', async () => {
+  const res = await apiFetch(
+    `http://localhost:8080/boards/${boardId}`,
+    { method: "DELETE" }
+  );
 
-document.querySelectorAll(".confirm").forEach(btn => btn.addEventListener("click", () => {
-  alert("삭제 완료 (모의)");
-  closeModal("postDeleteModal");
-  closeModal("commentDeleteModal");
-}));
+  if (!res.ok) {
+    alert("게시글 삭제 실패");
+    return;
+  }
+
+  postDeleteModal.style.display = "none";
+
+  window.location.href = "boards.html";
+});

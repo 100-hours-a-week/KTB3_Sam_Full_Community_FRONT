@@ -157,7 +157,10 @@ document.addEventListener('click', (e) => {
 });
 
 // 로그아웃 버튼
-logoutBtn.addEventListener('click', () => logout);
+logoutBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  logout();
+});
 
 
 //폼 제출

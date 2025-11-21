@@ -1,27 +1,39 @@
 body {
-  background-color: #f4f5f7;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
+  background-color: #F4F5F7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 0;
 }
 
 header {
+  width: 1920px;
+  height: 104px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
   position: relative;
-  background-color: #fff;
-  border-bottom: 1px solid #ccc;
+  background-color: #F4F5F7;
+  border-bottom: 1px solid black;
 }
 
 .back-btn {
   position: absolute;
   left: 50%;
   transform: translateX(calc(-100% - clamp(40px, 30vw, 210px)));
+  font-size: 22px;
   background: none;
   border: none;
-  font-size: 22px;
   cursor: pointer;
+}
+
+.title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: 600;
 }
 
 .profile-menu {
@@ -45,6 +57,8 @@ header {
 
 /* 가로 드롭다운 */
 .dropdown {
+  width: 130px;
+  height: 120px;
   display: none;
   position: absolute;
   right: 0;
@@ -57,7 +71,7 @@ header {
   min-width: 140px;
 }
 
-.dropdown a {
+.dropdown a{
   display: block;
   padding: 10px;
   color: black;
@@ -66,9 +80,26 @@ header {
   white-space: nowrap;
 }
 
-.dropdown a:hover {
+.dropdown a:hover{
   background-color: #eee;
 }
+
+.logout-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 0;
+  text-align: center;
+  font: inherit;
+  cursor: pointer;
+  color: black;
+}
+
+.logout-btn:hover {
+  background-color: #eee;
+}
+
 
 .profile-menu.active .dropdown {
   display: block;
@@ -76,28 +107,54 @@ header {
 
 /* Post */
 .post-wrapper {
+  margin-top: 30px;
   max-width: 700px; /* 이전처럼 여백 유지 */
-  margin: 40px auto;
-  background-color: white;
-  border-radius: 12px;
-  padding: 30px 40px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background-color: #F4F5F7;
 }
 
 .post-body-wrapper {
   margin-top: 20px;
+  overflow: visible;
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-#post-image {
-  display: block;
-  margin: 0 auto;
-}
-
-#post-body {
-  text-align: left;
+/* 전체 이미지 슬라이더 박스 */
+.image-slider {
+  width: 100%;
   max-width: 600px;
-  margin: 16px auto 0;
-  line-height: 1.6;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;  
+  border-radius: 10px;
+}
+
+#sliderImage {
+  width: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+/* 아래 작은 점들 */
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 20px;
+  gap: 6px;
+}
+
+.slider-dots .dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ccc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider-dots .dot.active {
+  background-color: #7f6aee;
 }
 
 #post-title {
@@ -148,7 +205,7 @@ header {
 }
 
 .post-actions .danger {
-  background-color: #aca0eb;
+  background-color: #7f6aee;
   color: white;
   border: none;
 }
@@ -169,7 +226,7 @@ header {
   width: 120px;
   height: 80px;
   border-radius: 12px;
-  background-color: #e5e5e5;
+  background-color: #D9D9D9;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease;
 }
@@ -186,9 +243,20 @@ header {
   margin-top: 4px;
 }
 
-.stat-box:hover {
+#likes:hover {
   transform: translateY(-2px);
 }
+
+#likes {
+  background-color: #D9D9D9;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+#likes.liked {
+  background-color: #ACA0EB;
+}
+
 
 
 /* Comments */
@@ -197,7 +265,7 @@ header {
 }
 
 #comment-input {
-  width: 100%;
+  width: 96%;
   border-radius: 8px;
   border: 1px solid #ccc;
   padding: 10px;
@@ -219,8 +287,8 @@ header {
   padding: 10px 20px;
   font-size: 15px;
   font-weight: 600;
-  cursor: not-allowed;
   transition: background-color 0.3s, transform 0.1s;
+  margin-bottom: 20px;
 }
 
 /* 활성화 상태 */
@@ -240,9 +308,11 @@ header {
 
 #comment-list li {
   margin-top: 15px;
-  padding: 10px;
+  padding: 20px;
   background: #fafafa;
-  border-radius: 8px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .comment-info {
@@ -260,6 +330,12 @@ header {
   margin-top: 0;          /* 혹시 위로 뜨는 경우 방지 */
 }
 
+.comment-text {
+  margin-top: 20px;
+  margin-left: 5px;
+  line-height: 1.6;
+}
+
 .comment-actions {
   display: flex;
   justify-content: flex-end; /* 오른쪽 정렬 */
@@ -273,6 +349,61 @@ header {
   border-radius: 4px;
   padding: 4px 8px;
   cursor: pointer;
+}
+
+/* ----------- 수정 textarea ----------- */
+.edit-area {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px;
+  margin-top: 14px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+  font-size: 14px;
+  line-height: 1.6;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.edit-area:focus {
+  border-color: #b7b7b7;   /* 부드러운 회색 */
+}
+
+/* ----------- 수정 버튼 영역 ----------- */
+.edit-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.edit-buttons button {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+/* 수정 완료 버튼 */
+.edit-buttons .save-edit {
+  background-color: #7F6AEE;
+  color: white;
+}
+
+.edit-buttons .save-edit:hover {
+  background-color: #6b59d4;
+}
+
+/* 취소 버튼 */
+.edit-buttons .cancel-edit {
+  background-color: #ddd;
+}
+
+.edit-buttons .cancel-edit:hover {
+  background-color: #c8c8c8;
 }
 
 /* Modal */
@@ -300,6 +431,11 @@ header {
   margin-top: 20px;
 }
 
+.confirmDelete {
+  font-size: 20px;
+  font-weight: 700;
+}
+
 .modal-actions button {
   flex: 1;
   margin: 0 5px;
@@ -310,6 +446,6 @@ header {
 }
 
 .modal-actions .danger {
-  background: #aca0eb;
+  background: #7f6aee;
   color: white;
 }

@@ -150,4 +150,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-logoutBtn.addEventListener('click', () => logout);
+logoutBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  logout();
+});

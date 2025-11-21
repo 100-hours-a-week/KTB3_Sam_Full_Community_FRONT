@@ -178,7 +178,10 @@ document.addEventListener('click', (e) => {
 });
 
 // 로그아웃 버튼
-logoutBtn.addEventListener('click', () => logout);
+logoutBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  logout();
+});
 
 
 // 게시글 작성 이동 버튼
