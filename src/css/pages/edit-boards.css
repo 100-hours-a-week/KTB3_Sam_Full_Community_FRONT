@@ -1,0 +1,120 @@
+/* ====== 전체 Wrapper ====== */
+.post-wrapper {
+  width: 100%;
+  max-width: 760px; /* 기존보다 넓게 변경 */
+  margin: 60px auto 100px auto;
+  padding: 40px 55px;
+  border-radius: 16px;
+}
+
+.post-wrapper > h2 {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+/* ====== Form Wrapper ====== */
+.post-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.post-form label {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 22px;
+  margin-bottom: 8px;
+  color: #333;
+  display: block;
+  text-align: left;
+}
+
+.post-form input[type="text"],
+.post-form textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #ccd3e3;
+  font-size: 15px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.post-form input:focus,
+.post-form textarea:focus {
+  border-color: #406aff;
+  box-shadow: 0 0 0 3px rgba(64, 106, 255, 0.18);
+  outline: none;
+}
+
+.post-form textarea {
+  min-height: 180px;
+  resize: none;
+}
+
+/* ====== 이미지 프리뷰 영역 ====== */
+#preview {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.preview-box {
+  width: 110px;
+  height: 110px;
+  position: relative;
+  border-radius: 10px;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #cdd3e0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 삭제 버튼 (프리뷰 위) */
+.delete-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff4d4d;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ====== 제출 버튼 ====== */
+.submit-btn {
+  width: 100%;
+  padding: 14px 0;
+  margin-top: 25px;
+
+  background-color: #7f9afc; /* 서비스 블루 컬러 */
+  color: white;
+
+  font-size: 17px;
+  font-weight: 600;
+
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.submit-btn:hover {
+  background-color: #6d89f0;
+}

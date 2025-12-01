@@ -1,0 +1,109 @@
+#globalHeader {
+  width: 1920px;
+  height: 104px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-color: #f4f5f7;
+}
+
+.back-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(calc(-100% - clamp(40px, 30vw, 210px)));
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.logo-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.logo-kate {
+  color: black;
+}
+
+.logo-boo {
+  color: #406aff; /* 파란색 */
+}
+
+.profile-menu {
+  position: absolute;
+  left: 50%;
+  transform: translateX(calc(100% + clamp(40px, 30vw, 210px)));
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  filter: brightness(0.9) grayscale(0.2);
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+
+  display: none;
+  margin-top: 10px;
+  width: 160px;
+
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* 드롭다운 활성화 */
+.profile-menu.active .dropdown {
+  display: block;
+}
+
+/* 메뉴 항목 */
+.dropdown a,
+.logout-btn {
+  display: block;
+  padding: 12px;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  background: white;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 15px;
+}
+
+.dropdown a:hover,
+.logout-btn:hover {
+  background-color: #f0f4ff;
+  color: #406aff;
+}
+
+/* 로그아웃 버튼 */
+.logout-btn {
+  border: none;
+  font: inherit;
+  width: 100%;
+}
+
+/* Fade 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,200 @@
+.edit-container {
+  width: 400px;
+  margin: 60px auto;
+  padding: 40px;
+}
+
+.edit-container h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: black;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.profile-section {
+  text-align: left;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.profile-section > p {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.profile-wrapper {
+  width: 140px;
+  height: 140px;
+  position: relative;
+  margin: 0 auto 15px;
+  z-index: 10;
+}
+
+.profile-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+
+  background-color: #e1e7ff;
+  border: 2px solid #cbd5ff;
+  transition: filter 0.25s ease;
+  pointer-events: none;
+
+  z-index: 5;
+}
+
+.profile-img.gray {
+  filter: grayscale(60%) brightness(0.5);
+  transition: filter 0.25s ease;
+}
+
+/* ===========================
+   변경 버튼 통일 (회원가입 버튼 스타일 기준)
+=========================== */
+.change-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  padding: 8px 14px;
+  font-size: 14px;
+  color: white;
+  background-color: rgba(64, 106, 255, 0.9);
+
+  border: none;
+  border-radius: 18px; /* 더 둥글고 자연스럽게 */
+
+  cursor: pointer;
+  backdrop-filter: blur(2px); /* 살짝 유리 느낌 */
+  transition: background-color 0.25s ease, transform 0.25s ease;
+
+  z-index: 50;
+}
+
+/* ===========================
+   input 간격 통일 (form.css 보완)
+=========================== */
+.email-field {
+  background-color: transparent !important;
+  border: none !important;
+  padding-left: 0 !important;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ===========================
+   수정하기 버튼 통일 (primary 스타일)
+=========================== */
+#submitBtn {
+  margin-top: 25px;
+  width: 100%;
+  padding: 12px 0;
+  background-color: #406aff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#submitBtn:hover {
+  background-color: #2f54d1;
+}
+
+/* ===========================
+   회원탈퇴 버튼 스타일
+=========================== */
+/* 회원탈퇴 버튼을 텍스트 링크처럼 보이게 */
+.withdraw-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: #333; /* 텍스트만 보이도록 */
+
+  cursor: pointer;
+  position: relative;
+
+  display: block; /* 가로 센터 정렬 가능하게 */
+  margin: 18px auto 0; /* 가운데 정렬 */
+}
+
+/* 밑줄 애니메이션 */
+.withdraw-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+
+  width: 0%;
+  height: 2px;
+  background-color: #333;
+
+  transition: width 0.25s ease;
+}
+
+/* hover 시 밑줄 슬라이드 */
+.withdraw-btn:hover::after {
+  width: 100%;
+}
+
+/* === TOAST 기본 스타일 (업그레이드) === */
+#toast {
+  visibility: hidden;
+
+  min-width: 150px;
+  max-width: 240px;
+
+  background-color: rgba(64, 106, 255, 0.95); /* 서비스 메인 컬러 */
+  color: #fff;
+
+  text-align: center;
+  border-radius: 18px;
+  padding: 12px 20px;
+
+  position: fixed;
+  left: 50%;
+  bottom: 60px;
+  transform: translateX(-50%);
+
+  z-index: 9999;
+  font-size: 15px;
+  font-weight: 600;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+/* === 토스트 등장/사라짐 === */
+#toast.show {
+  visibility: visible;
+  animation: fadein 0.35s ease, fadeout 0.5s ease 1.2s;
+}
+
+/* === 기존 애니메이션 유지하면서 UX 개선 === */
+@keyframes fadein {
+  from {
+    opacity: 0;
+    bottom: 50px;
+  }
+  to {
+    opacity: 1;
+    bottom: 60px;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1;
+    bottom: 60px;
+  }
+  to {
+    opacity: 0;
+    bottom: 50px;
+  }
+}

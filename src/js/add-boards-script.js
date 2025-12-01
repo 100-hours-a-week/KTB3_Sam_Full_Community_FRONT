@@ -1,16 +1,15 @@
-import { apiFetch, logout } from "./auth.js";
+import { apiFetch, logout } from "./common/auth.js";
 
 let selectedFiles = [];
-const profileMenu = document.getElementById('profileMenu');
-const profileIcon = document.getElementById('profileIcon');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const logoutBtn = document.getElementById('logoutBtn');
-const addBtn = document.getElementById('add-btn');
+const profileMenu = document.getElementById("profileMenu");
+const profileIcon = document.getElementById("profileIcon");
+const dropdownMenu = document.getElementById("dropdownMenu");
+const logoutBtn = document.getElementById("logoutBtn");
+const addBtn = document.getElementById("add-btn");
 const imageInput = document.getElementById("image");
 const preview = document.getElementById("preview");
-const form  = document.getElementById("postForm");
+const form = document.getElementById("postForm");
 const contentHelper = document.getElementById("content-helper");
-
 
 //이미지 미리보기
 function renderPreview() {
@@ -59,7 +58,7 @@ async function getPresignedUrl() {
   const data = await res.json();
   return {
     imageId: data.data.imageId,
-    uploadUrl: data.data.imagePresignedUrl
+    uploadUrl: data.data.imagePresignedUrl,
   };
 }
 
@@ -88,11 +87,6 @@ async function uploadAllImages(files) {
   return imageIds;
 }
 
-
-loadUserProfile();
-
-
-
 // 이미지 파일 추가
 imageInput.addEventListener("change", () => {
   const files = Array.from(imageInput.files);
@@ -101,61 +95,6 @@ imageInput.addEventListener("change", () => {
 
   renderPreview();
 });
-
-//뒤로가기 버튼
-backBtn.addEventListener("click", () => {
-  history.back();
-});
-
-//프로필 이미지 
-profileIcon.addEventListener('click', (e) => {
-  e.stopPropagation(); // 클릭 버블링 방지
-  profileMenu.classList.toggle('active');
-});
-
-//프로필 이미지 
-async function loadUserProfile() {
-  try {
-    // 1. 유저 정보 조회
-    const userInfoRes = await apiFetch("http://localhost:8080/users", {
-      method: "GET"
-    });
-
-    if (!userInfoRes) return;
-
-    const user = await userInfoRes.json();
-    const profileImageId = user.data.profileImageId;
-
-    // 2. presigned GET URL 요청
-    const presignedRes = await fetch(`http://localhost:8080/images/${profileImageId}`, {
-      method: "GET",
-    });
-
-    const imageUrlResponse = await presignedRes.json();
-    const imagePresignedUrl = imageUrlResponse.data.imagePresignedUrl;
-
-    // 3. img src에 세팅
-    profileIcon.src = imagePresignedUrl;
-
-  } catch (err) {
-    console.error("프로필 이미지 로드 실패:", err);
-  }
-}
-
-
-// 드롭다운 화면 다른 곳 클릭 시 닫기
-document.addEventListener('click', (e) => {
-  if (!profileMenu.contains(e.target)) {
-    profileMenu.classList.remove('active');
-  }
-});
-
-// 로그아웃 버튼
-logoutBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  logout();
-});
-
 
 //폼 제출
 form.addEventListener("submit", async (e) => {
@@ -171,7 +110,6 @@ form.addEventListener("submit", async (e) => {
     contentHelper.textContent = "";
   }
 
-
   // 1) 이미지 업로드
   const imageIds = await uploadAllImages(selectedFiles);
 
@@ -181,7 +119,7 @@ form.addEventListener("submit", async (e) => {
     body: JSON.stringify({
       title,
       content,
-      boardImageIds: imageIds
+      boardImageIds: imageIds,
     }),
   });
 
@@ -194,4 +132,3 @@ form.addEventListener("submit", async (e) => {
     alert(result.message);
   }
 });
-

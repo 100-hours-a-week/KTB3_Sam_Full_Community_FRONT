@@ -1,9 +1,9 @@
-import { apiFetch, logout } from "./auth.js";
+import { apiFetch, logout } from "./common/auth.js";
 
-const profileMenu = document.getElementById('profileMenu');
-const profileIcon = document.getElementById('profileIcon');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const logoutBtn = document.getElementById('logoutBtn');
+const profileMenu = document.getElementById("profileMenu");
+const profileIcon = document.getElementById("profileIcon");
+const dropdownMenu = document.getElementById("dropdownMenu");
+const logoutBtn = document.getElementById("logoutBtn");
 
 const passwordInput = document.getElementById("password");
 const passwordCheckInput = document.getElementById("passwordCheck");
@@ -14,7 +14,6 @@ const passwordCheckHelper = document.getElementById("passwordCheckHelper");
 const submitBtn = document.getElementById("submitBtn");
 const toast = document.getElementById("toast");
 const passwordForm = document.getElementById("passwordForm");
-
 
 // 비밀번호 유효성 검사
 function validatePassword() {
@@ -37,7 +36,6 @@ function validatePassword() {
   return true;
 }
 
-
 // 비밀번호 확인 검사
 function validatePasswordCheck() {
   if (passwordCheckInput.value.trim() === "") {
@@ -53,7 +51,6 @@ function validatePasswordCheck() {
   return true;
 }
 
-
 // 전체 입력 확인해서 버튼 활성화
 function updateButtonState() {
   if (validatePassword() && validatePasswordCheck()) {
@@ -65,47 +62,9 @@ function updateButtonState() {
   }
 }
 
-//프로필 이미지 
-async function loadUserProfile() {
-  try {
-    // 1. 유저 정보 조회
-    const userInfoRes = await apiFetch("http://localhost:8080/users", {
-      method: "GET"
-    });
-
-    if (!userInfoRes) return;
-
-    const user = await userInfoRes.json();
-    const profileImageId = user.data.profileImageId;
-
-    // 2. presigned GET URL 요청
-    const presignedRes = await fetch(`http://localhost:8080/images/${profileImageId}`, {
-      method: "GET",
-    });
-
-    const imageUrlResponse = await presignedRes.json();
-    const imagePresignedUrl = imageUrlResponse.data.imagePresignedUrl;
-
-    // 3. img src에 세팅
-    profileIcon.src = imagePresignedUrl;
-
-    emailField.value = user.data.email;
-    originalNickname = user.data.nickname;
-
-  } catch (err) {
-    console.error("프로필 이미지 로드 실패:", err);
-  }
-}
-
-
-
-loadUserProfile();
-
-
 // 이벤트 등록
 passwordInput.addEventListener("input", updateButtonState);
 passwordCheckInput.addEventListener("input", updateButtonState);
-
 
 // 폼 제출
 passwordForm.addEventListener("submit", async (e) => {
@@ -115,12 +74,12 @@ passwordForm.addEventListener("submit", async (e) => {
 
   const body = {
     password: passwordInput.value,
-    checkPassword: passwordCheckInput.value
+    checkPassword: passwordCheckInput.value,
   };
 
   const res = await apiFetch("http://localhost:8080/users/password", {
     method: "PATCH",
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
@@ -132,24 +91,7 @@ passwordForm.addEventListener("submit", async (e) => {
   toast.classList.add("show");
 
   setTimeout(() => {
-    toast.classList.remove('show')
+    toast.classList.remove("show");
     window.location.href = "login.html";
   }, 1000);
-});
-
-profileIcon.addEventListener('click', (e) => {
-  e.stopPropagation(); // 클릭 버블링 방지
-  profileMenu.classList.toggle('active');
-});
-
-// 화면 다른 곳 클릭 시 닫기
-document.addEventListener('click', (e) => {
-  if (!profileMenu.contains(e.target)) {
-    profileMenu.classList.remove('active');
-  }
-});
-
-logoutBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  logout();
 });
