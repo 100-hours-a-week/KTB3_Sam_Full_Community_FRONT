@@ -101,7 +101,7 @@ form.addEventListener("submit", async (e) => {
 
       alert("로그인 성공! 게시글 목록 페이지로 이동합니다.");
 
-      window.location.href = "refactoring-boards.html";
+      window.location.href = "boards.html";
     } catch (error) {
       console.error("로그인 에러:", error);
 
