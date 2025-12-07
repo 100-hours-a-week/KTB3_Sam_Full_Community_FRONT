@@ -1,0 +1,8 @@
+body {
+  font-family: "Noto Sans KR", sans-serif;
+  background-color: #eef3ff; /* kateboo lilac-blue background */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}

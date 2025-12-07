@@ -1,0 +1,121 @@
+/* ====== 메인 컨테이너 ====== */
+.container {
+  margin: 40px auto;
+}
+
+/* ====== 인사글 영역 ====== */
+.greeting {
+  text-align: center;
+  margin-top: 40px;
+  width: 600px;
+}
+
+.greeting-text {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+.greeting-bold {
+  font-weight: 700;
+}
+
+/* ====== 게시글 작성 버튼 ====== */
+.greeting-btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.write-btn {
+  background-color: #8da6ff; /* kateboo 연파랑 */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-right: 15px;
+  margin-bottom: 20px;
+}
+
+.write-btn:hover {
+  background-color: #406aff; /* 진파랑 */
+}
+
+/* ====== 게시글 리스트 ====== */
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* ====== 각 게시글 카드 ====== */
+.post-card {
+  background-color: white;
+  border-radius: 18px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid #eef1ff;
+}
+
+/* Hover 스타일 */
+.post-card:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 8px 20px rgba(90, 115, 255, 0.22);
+  background: #f5f7ff;
+  border-color: #bfd3ff;
+}
+
+/* 제목 */
+.post-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #222;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 14px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile span {
+  font-size: 14px;
+  color: #333;
+}
+
+/* 더보기 / 무한스크롤 안내 */
+.load-more {
+  text-align: center;
+  padding: 15px;
+  color: #777;
+  font-size: 14px;
+}

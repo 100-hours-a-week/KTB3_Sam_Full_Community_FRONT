@@ -1,12 +1,12 @@
-import { apiFetch, logout } from "./auth.js";
+import { apiFetch, logout } from "./common/auth.js";
 
-const profileMenu = document.getElementById('profileMenu');
-const profileIcon = document.getElementById('profileIcon');
-const dropdownMenu = document.getElementById('dropdownMenu');
-const logoutBtn = document.getElementById('logoutBtn');
-const editBtn = document.getElementById('edit-btn');
+const profileMenu = document.getElementById("profileMenu");
+const profileIcon = document.getElementById("profileIcon");
+const dropdownMenu = document.getElementById("dropdownMenu");
+const logoutBtn = document.getElementById("logoutBtn");
+const editBtn = document.getElementById("edit-btn");
 const preview = document.getElementById("preview");
-const form  = document.getElementById("postForm");
+const form = document.getElementById("postForm");
 
 const urlParams = new URLSearchParams(window.location.search);
 const stringBoardId = urlParams.get("id");
@@ -18,7 +18,7 @@ const imageInput = document.getElementById("image");
 
 let selectedFiles = [];
 let existingImages = [];
-let removedImageIds = [];   
+let removedImageIds = [];
 
 //이미지 미리보기
 function renderPreview() {
@@ -69,13 +69,13 @@ async function getPresignedUrl() {
   const data = await res.json();
   return {
     imageId: data.data.imageId,
-    uploadUrl: data.data.imagePresignedUrl
+    uploadUrl: data.data.imagePresignedUrl,
   };
 }
 
 async function loadBoard() {
   const res = await apiFetch(`http://localhost:8080/boards/${boardId}`, {
-    method: "GET"
+    method: "GET",
   });
   const json = await res.json();
 
@@ -90,10 +90,10 @@ async function loadBoard() {
 async function loadExistingImages(ids) {
   preview.innerHTML = "";
 
-  const requests = ids.map(id =>
+  const requests = ids.map((id) =>
     fetch(`http://localhost:8080/images/${id}`)
-      .then(res => res.json())
-      .then(json => ({ id, url: json.data.imagePresignedUrl }))
+      .then((res) => res.json())
+      .then((json) => ({ id, url: json.data.imagePresignedUrl }))
   );
 
   const images = await Promise.all(requests);
@@ -112,7 +112,7 @@ async function loadExistingImages(ids) {
 
     deleteBtn.addEventListener("click", () => {
       removedImageIds.push(id);
-      existingImages = existingImages.filter(imgId => imgId !== id);
+      existingImages = existingImages.filter((imgId) => imgId !== id);
       box.remove();
     });
 
@@ -156,61 +156,6 @@ imageInput.addEventListener("change", () => {
   renderPreview();
 });
 
-//뒤로가기 버튼
-backBtn.addEventListener("click", () => {
-  history.back();
-});
-
-//프로필 이미지 
-profileIcon.addEventListener('click', (e) => {
-  e.stopPropagation(); // 클릭 버블링 방지
-  profileMenu.classList.toggle('active');
-});
-
-//프로필 이미지 
-async function loadUserProfile() {
-  try {
-    // 1. 유저 정보 조회
-    const userInfoRes = await apiFetch("http://localhost:8080/users", {
-      method: "GET"
-    });
-
-    if (!userInfoRes) return;
-
-    const user = await userInfoRes.json();
-    const profileImageId = user.data.profileImageId;
-
-    // 2. presigned GET URL 요청
-    const presignedRes = await fetch(`http://localhost:8080/images/${profileImageId}`, {
-      method: "GET",
-    });
-
-    const imageUrlResponse = await presignedRes.json();
-    const imagePresignedUrl = imageUrlResponse.data.imagePresignedUrl;
-
-    // 3. img src에 세팅
-    profileIcon.src = imagePresignedUrl;
-
-  } catch (err) {
-    console.error("프로필 이미지 로드 실패:", err);
-  }
-}
-
-
-// 드롭다운 화면 다른 곳 클릭 시 닫기
-document.addEventListener('click', (e) => {
-  if (!profileMenu.contains(e.target)) {
-    profileMenu.classList.remove('active');
-  }
-});
-
-// 로그아웃 버튼
-logoutBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  logout();
-});
-
-
 //폼 제출
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -228,8 +173,8 @@ form.addEventListener("submit", async (e) => {
 
   // 최종 보낼 이미지 IDs = 기존 이미지 - 삭제된 이미지 + 업로드된 이미지
   const finalImageIds = [
-    ...existingImages.filter(id => !removedImageIds.includes(id)),
-    ...newImageIds
+    ...existingImages.filter((id) => !removedImageIds.includes(id)),
+    ...newImageIds,
   ];
 
   // 2) PUT 수정 요청
@@ -238,16 +183,15 @@ form.addEventListener("submit", async (e) => {
     body: JSON.stringify({
       title,
       content,
-      boardImageIds: finalImageIds
+      boardImageIds: finalImageIds,
     }),
   });
 
   if (boardRes.ok) {
     window.location.href = `boards-detail.html?id=${boardId}`;
   } else {
-    alert('erorr');
+    alert("erorr");
   }
 });
 
-loadUserProfile();
 loadBoard();

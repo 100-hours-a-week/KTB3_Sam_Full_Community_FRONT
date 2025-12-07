@@ -1,0 +1,366 @@
+/* ====== 전체 Wrapper ====== */
+.post-wrapper {
+  width: 100%;
+  max-width: 760px;
+  margin: 40px auto 120px auto;
+  padding: 10px 20px;
+}
+
+/* ====== 게시글 제목 ====== */
+#post-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+/* ====== 헤더 (작성자, 날짜, 수정/삭제) ====== */
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.author-img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e8ff;
+}
+
+.author-info {
+  flex: 1;
+  margin-left: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+.post-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.post-actions button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.post-actions button:hover {
+  background: #ececff;
+}
+
+.post-actions .danger {
+  color: red;
+  border-color: #ff8a8a;
+}
+
+/* ====== 이미지 슬라이더 ====== */
+.image-slider {
+  width: 100%;
+  height: 330px;
+  background: #f8f8ff;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#sliderImage {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 6px;
+}
+
+.slider-dots span {
+  width: 10px;
+  height: 10px;
+  background: #d3d6ff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider-dots .active {
+  background: #406aff;
+}
+
+/* ====== 본문 ====== */
+#post-body {
+  margin-top: 30px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-line;
+}
+
+/* ====== 통계 (좋아요 / 조회수 / 댓글) ====== */
+.post-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  gap: 14px;
+}
+
+.stat-box {
+  flex: 1;
+  background: #f4f3fc;
+  border-radius: 18px;
+  padding: 22px 10px;
+  text-align: center;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.stat-box strong {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2f2f2f;
+}
+
+.stat-box span {
+  font-size: 14px;
+  margin-top: 6px;
+  display: block;
+  color: #666;
+}
+
+/* 좋아요 박스만 hover */
+#likes:hover {
+  background: #e6efff; /* 연한 서비스 블루 */
+  border-color: #4a74ff;
+  transform: translateY(-2px);
+  transition: 0.15s ease;
+  cursor: pointer;
+}
+
+/* 좋아요 활성화(liked 된 상태) 시 색 변경 */
+#likes.liked {
+  background: #d8e4ff;
+  border-color: #4a74ff;
+}
+
+/* ====== 댓글 입력 영역 ====== */
+/* ============================
+      댓글 전체 영역
+============================ */
+.comment-section {
+  margin-top: 30px;
+}
+
+/* ============================
+      댓글 입력창
+============================ */
+#comment-input {
+  width: 96%;
+  border-radius: 8px;
+  border: 1px solid #c7cce6;
+  padding: 12px;
+  resize: none;
+  height: 90px;
+  margin-bottom: 12px;
+  background: #ffffff;
+  transition: border 0.2s;
+}
+
+#comment-input:focus {
+  border-color: #6b8cff; /* 서비스 블루 포커스 */
+  outline: none;
+}
+
+/* ============================
+      댓글 등록 버튼
+============================ */
+.comment-submit-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+#comment-submit {
+  background-color: #b6c4ff; /* 비활성 느낌의 블루톤 */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background-color 0.25s, transform 0.1s;
+}
+
+#comment-submit.active {
+  background-color: #6b8cff; /* 활성화 블루 */
+  cursor: pointer;
+}
+
+#comment-submit.active:hover {
+  transform: translateY(-2px);
+  background-color: #4f70ff;
+}
+
+/* ============================
+      댓글 리스트
+============================ */
+#comment-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* 댓글 카드 */
+#comment-list li {
+  margin-top: 15px;
+  padding: 20px;
+  background: #fafbff; /* 아주 연한 블루톤 */
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* 댓글 상단 정보 */
+.comment-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-profile {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-author {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 댓글 본문 */
+.comment-text {
+  margin-top: 18px;
+  margin-left: 5px;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* ============================
+      댓글 수정/삭제 버튼
+============================ */
+.comment-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
+}
+
+.comment-actions button {
+  margin-left: 6px;
+  border: none;
+  background: #e2e6f7;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.comment-actions button:hover {
+  background: #cdd6ff;
+}
+
+/* ============================
+      댓글 수정 textarea
+============================ */
+.edit-area {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px;
+  margin-top: 14px;
+  margin-bottom: 10px;
+  border: 1px solid #c7cce6;
+  border-radius: 8px;
+  resize: vertical;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #ffffff;
+}
+
+.edit-area:focus {
+  border-color: #6b8cff;
+}
+
+/* ============================
+      댓글 수정 버튼 영역
+============================ */
+.edit-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* 저장 버튼 */
+.edit-buttons .save-edit {
+  background-color: #6b8cff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.edit-buttons .save-edit:hover {
+  background-color: #4f70ff;
+}
+
+/* 취소 버튼 */
+.edit-buttons .cancel-edit {
+  background-color: #e2e6f7;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.edit-buttons .cancel-edit:hover {
+  background-color: #cdd6ff;
+}
+
+/* 수정 상태일 때 상단 버튼 안 보이게 하는 보조 클래스 */
+.comment-top.hide-actions .top-actions {
+  display: none !important;
+}
+
+/* 수정 버튼 영역 안정적인 정렬 */
+.edit-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* 저장/취소 버튼 크기 통일 */
+.edit-buttons button {
+  padding: 8px 16px;
+  height: 38px;
+  line-height: 20px;
+}
+
+/* textarea 박스 정렬 보정 */
+.edit-area {
+  box-sizing: border-box;
+  width: 100%;
+}
