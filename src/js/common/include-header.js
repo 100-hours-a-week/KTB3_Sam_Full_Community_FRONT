@@ -43,7 +43,7 @@ export async function loadHeader({
   // 로그아웃
   logoutBtn?.addEventListener("click", () => {
     localStorage.clear();
-    window.location.href = "refactoring-login.html";
+    window.location.href = "login.html";
   });
 
   if (backUrl) {
